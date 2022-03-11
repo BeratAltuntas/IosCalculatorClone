@@ -31,7 +31,6 @@ class ViewController: UIViewController {
     @IBAction func ReverseNumber(_ sender: Any) {
         
         DoMath(operation: "reverse", isFunc: true)
-        previousOperation = "reverse"
     }
     @IBAction func Divide(_ sender: Any) {
         DoMath(operation: "divide", isFunc: true)
@@ -98,18 +97,22 @@ class ViewController: UIViewController {
     func DoMath(operation:String,whereToWrite: String? = "lower", isFunc: Bool){
         
         if isFunc{
-            let options = DoMath(operation: operation)
+            var options = DoMath(operation: operation)
             var writeWhere = "upper"
-            DoMath(operation: "clearUpper", isFunc: false)
             
-            if operation=="reverse"{
+            
+            if operation=="reverse" {
+                if labelUpperNumber.text!.count<=0{
+                    options = String(Int(options)! * -1)
+                }
                 writeWhere = "lower"
+            }else{
+                DoMath(operation: "clearUpper", isFunc: false)
             }
-            
+            DoMath(operation: "clearLower", whereToWrite: nil, isFunc: false)
             for op in options{
                 DoMath(operation: String(op),whereToWrite: writeWhere,isFunc: false)
             }
-            DoMath(operation: "clearLower", whereToWrite: nil, isFunc: false)
         }
         
         switch operation{
@@ -119,11 +122,11 @@ class ViewController: UIViewController {
         case "clearUpper":
             labelUpperNumber.text = ""
             break
-        case "reverse":
-            var number = Int(labelLowerNumbers.text!)
-            number! *= -1
-            labelLowerNumbers.text! = String(number!)
-            break
+//        case "reverse":
+//            var number = Int(labelLowerNumbers.text!)
+//            number! *= -1
+//            labelLowerNumbers.text! = String(number!)
+//            break
         case "equal":
             if labelUpperNumber.text!.count>0 && labelLowerNumbers.text!.count>0 && labelLowerNumbers.text! != "0"{
                 print(previousOperation,1)
@@ -151,20 +154,31 @@ class ViewController: UIViewController {
                     labelLowerNumbers.text! += "."
                 }
             }
+            break
+        case "-":
+            
+            if whereToWrite == "upper"{
+                labelUpperNumber.text! += "-"
+            }
+            else if labelLowerNumbers.text!.contains("-"){
+                break
+            }else if whereToWrite == "lower"{
+                labelLowerNumbers.text! = "-"
+            }
             
             break
         case "0":
             let num = Int(labelLowerNumbers.text!)
-            if num == 0{
+            if whereToWrite == "upper"{
+                labelUpperNumber.text! += "0"
+            }else if num == 0{
                 break
             }else{
                 if whereToWrite == "lower"{
                     labelLowerNumbers.text! += "0"
                 }
             }
-            if whereToWrite == "upper"{
-                labelUpperNumber.text! += "0"
-            }
+            
             break
         case "1":
             let number = Int(labelLowerNumbers.text!)
@@ -332,7 +346,7 @@ class ViewController: UIViewController {
         }else if operation == "mod"{
             result = String(Int(upperNum) % Int(lowerNum))
         }else if operation == "reverse"{
-            result = String(lowerNum * -1)
+            result = String(Int(lowerNum) * -1)
         }
         return result
     }
